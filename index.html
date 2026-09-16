@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Trading experiments, probability notes, and market postmortems from someone trying to find real market edges without pretending the failures do not exist.">
+  <title>Overfit</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23f8f8f6'/%3E%3Cpath d='M7 22h18M7 16h18M7 10h18' stroke='%23171717' stroke-width='1.5'/%3E%3Ccircle cx='13' cy='16' r='2.6' fill='%234f6f52'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a class="brand" href="index.html">Overfit</a>
+      <nav aria-label="Primary navigation">
+        <a href="#experiments">Experiments</a>
+        <a href="#notes">Notes</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="home-title">
+        <h1 id="home-title">Overfit</h1>
+        <p class="lead">Trading experiments, probability notes, general thoughts, and market postmortems from a college freshman.</p>
+        <p class="small">Prediction markets. Crypto bots. Calibration. Backtests. Drawdowns.</p>
+        <div class="actions" aria-label="Primary actions">
+          <a class="button" href="#notes">Read the latest note</a>
+          <a class="button secondary" href="#experiments">View experiment log</a>
+        </div>
+      </section>
+
+      <section id="notes" aria-labelledby="notes-title">
+        <h2 id="notes-title">Latest Notes</h2>
+        <div class="notes" id="latest-notes">
+          <p class="small">Loading notes...</p>
+        </div>
+      </section>
+
+      <section id="experiments" aria-labelledby="experiments-title">
+        <h2 id="experiments-title">Experiment Log</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Experiment</th>
+                <th>Market</th>
+                <th>Status</th>
+                <th>Sample</th>
+                <th>Result</th>
+                <th>Lesson</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2026-09-12</td>
+                <td>Kalshi BTC/crypto YES bot</td>
+                <td>Kalshi</td>
+                <td><span class="badge">Failed</span></td>
+                <td>508 trades</td>
+                <td>-$99.07</td>
+                <td>Cheap YES contracts leaked capital faster than the model edge could prove itself.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="areas-title">
+        <h2 id="areas-title">Research Areas</h2>
+        <div class="areas">
+          <div class="area">
+            <h3>Prediction Markets</h3>
+            <p>Kalshi, Polymarket, binary contracts, event odds, market calibration.</p>
+          </div>
+          <div class="area">
+            <h3>Trading Bots</h3>
+            <p>Paper execution, logging, backtests, scanners, alerting, PnL analysis.</p>
+          </div>
+          <div class="area">
+            <h3>Probability Notes</h3>
+            <p>Expected value, variance, break-even win rate, overfitting, drawdowns.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" aria-labelledby="about-title">
+        <h2 id="about-title">About</h2>
+        <p class="about">I’m a freshman studying math and CS building market bots and other trading systems. This site is where I document what I test, what breaks, and what the data says afterward. I am currently a freshman at Ohio University, but I plan on transferring in 1-2 years.
+        This website is still very new and a WIP, *Please bare with me.*
+        </p>
+      </section>
+
+      <section aria-labelledby="follow-title">
+        <h2 id="follow-title">Follow</h2>
+        <div class="follow">
+          <p>Get new experiment notes when I publish them.</p>
+          <form action="mailto:hello@example.com" method="post" enctype="text/plain">
+            <label class="small" for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com">
+            <button type="submit">Subscribe</button>
+          </form>
+          <p class="small">No provider configured yet. This currently opens an email draft.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Overfit</span>
+      <span><a href="https://github.com/jamesbernosky">GitHub</a></span>
+      <span>Not financial advice. Experiments are paper unless explicitly stated otherwise.</span>
+    </footer>
+  </div>
+
+  <script>
+    const notesRoot = document.querySelector("#latest-notes");
+
+    const escapeText = (value) => {
+      const span = document.createElement("span");
+      span.textContent = value;
+      return span.innerHTML;
+    };
+
+    fetch("posts/posts.json")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Could not load posts.");
+        }
+        return response.json();
+      })
+      .then((posts) => {
+        notesRoot.innerHTML = posts.slice(0, 5).map((post) => {
+          const tags = post.tags.map((tag) => `<span class="tag">#${escapeText(tag)}</span>`).join("");
+          return `
+            <article class="note">
+              <div class="meta">${escapeText(post.date)}<br>${escapeText(post.category)}<br>${escapeText(post.readingTime)}</div>
+              <div>
+                <h3><a href="${escapeText(post.url)}">${escapeText(post.title)}</a></h3>
+                <p>${escapeText(post.description)}</p>
+                <div class="tags">${tags}</div>
+              </div>
+            </article>
+          `;
+        }).join("");
+      })
+      .catch(() => {
+        notesRoot.innerHTML = '<p class="small">Posts could not load. Run this site through the local server, not by opening the file directly.</p>';
+      });
+  </script>
+</body>
+</html>
