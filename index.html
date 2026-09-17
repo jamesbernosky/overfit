@@ -13,7 +13,6 @@
     <header>
       <a class="brand" href="index.html">Overfit</a>
       <nav aria-label="Primary navigation">
-        <a href="#experiments">Experiments</a>
         <a href="#notes">Notes</a>
         <a href="#about">About</a>
       </nav>
@@ -26,7 +25,7 @@
         <p class="small">Prediction markets. Crypto bots. Calibration. Backtests. Drawdowns.</p>
         <div class="actions" aria-label="Primary actions">
           <a class="button" href="#notes">Read the latest note</a>
-          <a class="button secondary" href="#experiments">View experiment log</a>
+          <a class="button secondary" href="#follow">Subscribe</a>
         </div>
       </section>
 
@@ -34,36 +33,6 @@
         <h2 id="notes-title">Latest Notes</h2>
         <div class="notes" id="latest-notes">
           <p class="small">Loading notes...</p>
-        </div>
-      </section>
-
-      <section id="experiments" aria-labelledby="experiments-title">
-        <h2 id="experiments-title">Experiment Log</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Experiment</th>
-                <th>Market</th>
-                <th>Status</th>
-                <th>Sample</th>
-                <th>Result</th>
-                <th>Lesson</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>2026-09-12</td>
-                <td>Kalshi BTC/crypto YES bot</td>
-                <td>Kalshi</td>
-                <td><span class="badge">Failed</span></td>
-                <td>508 trades</td>
-                <td>-$99.07</td>
-                <td>Cheap YES contracts leaked capital faster than the model edge could prove itself.</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </section>
 
@@ -88,20 +57,20 @@
       <section id="about" aria-labelledby="about-title">
         <h2 id="about-title">About</h2>
         <p class="about">I’m a freshman studying math and CS building market bots and other trading systems. This site is where I document what I test, what breaks, and what the data says afterward. I am currently a freshman at Ohio University, but I plan on transferring in 1-2 years.
-        This website is still very new and a WIP, *Please bare with me.*
+        This website is still new and a work in progress.
         </p>
       </section>
 
-      <section aria-labelledby="follow-title">
+      <section id="follow" aria-labelledby="follow-title">
         <h2 id="follow-title">Follow</h2>
         <div class="follow">
           <p>Get new experiment notes when I publish them.</p>
-          <form action="mailto:hello@example.com" method="post" enctype="text/plain">
+          <form id="newsletter-form">
             <label class="small" for="email">Email</label>
-            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com">
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
             <button type="submit">Subscribe</button>
           </form>
-          <p class="small">No provider configured yet. This currently opens an email draft.</p>
+          <p class="small" id="newsletter-status" role="status"></p>
         </div>
       </section>
     </main>
@@ -147,6 +116,38 @@
       .catch(() => {
         notesRoot.innerHTML = '<p class="small">Posts could not load. Run this site through the local server, not by opening the file directly.</p>';
       });
+
+    const form = document.querySelector("#newsletter-form");
+    const email = document.querySelector("#email");
+    const status = document.querySelector("#newsletter-status");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      status.textContent = "Subscribing...";
+
+      try {
+        const response = await fetch("/api/subscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: email.value
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "Subscription failed.");
+        }
+
+        form.reset();
+        status.textContent = result.message || "Check your email to confirm.";
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    });
   </script>
 </body>
 </html>

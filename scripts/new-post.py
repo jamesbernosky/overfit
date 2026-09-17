@@ -72,7 +72,6 @@ def main():
     <header>
       <a class="brand" href="../index.html">Overfit</a>
       <nav aria-label="Primary navigation">
-        <a href="../index.html#experiments">Experiments</a>
         <a href="../index.html#notes">Notes</a>
         <a href="../index.html#about">About</a>
       </nav>
